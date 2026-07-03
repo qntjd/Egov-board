@@ -1,0 +1,18 @@
+# Maven
+target/
+
+# Eclipse / STS
+.classpath
+.project
+.settings/
+.sts4-cache/
+
+# IDE
+.idea/
+*.iml
+
+# 로컬 설정 (DB 접속정보 등 민감정보)
+src/main/resources/egovframework/egovProps/globals.properties
+
+# 첨부파일 업로드 폴더 (용량 큰 실제 파일들)
+src/main/webapp/upload/

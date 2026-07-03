@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="boardApp.mapper.SignupMapper">
+
+    <select id="selectDupIdChk" parameterType="String" resultType="int">
+        SELECT COUNT(*)
+        FROM tb_user
+        WHERE USER_ID = #{userId}
+    </select>
+    <insert id ="insertUser" parameterType="boardApp.VO.UserVO">
+    	INSERT INTO tb_user (
+    		user_id, user_pw, user_name,email,phone_number,gender,birth,user_authority,user_enabled
+    	)VALUES (
+    		#{userId}, #{userPw}, #{userName}, #{email}, #{phoneNumber}, #{gender}, #{birth},#{userAuthority},#{userEnabled}
+    	)
+    </insert>
+    <select id="selectUserList" resultType="boardApp.VO.UserVO">
+    	SELECT user_no, user_id, user_name, email, phone_number, gender, birth
+    	FROM tb_user
+    	ORDER BY user_no DESC
+    </select>
+
+</mapper>

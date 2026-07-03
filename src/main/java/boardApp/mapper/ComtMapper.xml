@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="boardApp.mapper.ComtMapper">
+
+<select id="selectComt" parameterType="int" resultType="boardApp.VO.ComtVO">
+	SELECT comt_no, comt_content, comt_pw, secret_yn, writer_name
+	FROM tb_comment
+	WHERE comt_no = #{comtNo}
+	AND comt_del_yn = 'N'
+</select>
+<select id="selectComtList" parameterType="int" resultType="boardApp.VO.ComtVO">
+	SELECT comt_no, board_no, comt_content, writer_name, secret_yn, TO_CHAR(comt_date, 'YYYY-MM-DD HH24:MI:SS') AS comt_date
+	FROM tb_comment
+	WHERE board_no = #{boardNo}
+	AND comt_del_yn = 'N'
+	ORDER BY comt_no ASC
+</select>
+<select id="selectComtCnt" parameterType="int" resultType="int">
+	SELECT COUNT(*)
+	FROM tb_comment
+	WHERE board_no = #{boardNo}
+	AND comt_del_yn = 'N'
+</select>
+<insert id="insertComt" parameterType="boardApp.VO.ComtVO">
+	INSERT INTO tb_comment (
+		board_no, comt_content, writer_name, secret_yn, comt_pw, comt_date, comt_del_yn
+	
+	
+	)VALUES (
+		#{boardNo}, #{comtContent}, #{writerName}, #{secretYn}, #{comtPw}, SYSDATETIME, 'N'
+	
+	)
+</insert>
+<update id="deleteComt" parameterType="int">
+	UPDATE tb_comment
+	SET comt_del_yn = 'Y'
+	WHERE comt_no = #{comtNo}
+</update>
+
+</mapper>
+
+

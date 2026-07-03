@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/security
+        http://www.springframework.org/schema/security/spring-security-4.2.xsd
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+    <context:component-scan base-package="boardApp.security"/>
+
+    <http auto-config="true" use-expressions="true">
+
+        <!-- 정적 리소스 - /** 보다 먼저 와야 함 -->
+        <intercept-url pattern="/css/**" access="permitAll"/>
+        <intercept-url pattern="/js/**" access="permitAll"/>
+        <intercept-url pattern="/images/**" access="permitAll"/>
+
+        <!-- 로그인/회원가입은 누구나 접근 가능 -->
+        <intercept-url pattern="/login.do" access="permitAll"/>
+        <intercept-url pattern="/loginAction.do" access="permitAll"/>
+        <intercept-url pattern="/Register.do" access="permitAll"/>
+        <intercept-url pattern="/insertUser.do" access="permitAll"/>
+        <intercept-url pattern="/selectDupIdChk.do" access="permitAll"/>
+        <intercept-url pattern="/logout.do" access="permitAll"/>
+
+        <!-- 나머지는 로그인 필요 -->
+        <intercept-url pattern="/**" access="hasRole('ROLE_USER')"/>
+        <!-- 메세지 요청 -->
+        <intercept-url pattern="/sendMessage" access="permitAll"/>
+		<intercept-url pattern="/checkAuthNumber" access="permitAll"/>
+
+        <access-denied-handler ref="userDeniedHandler"/>
+
+        <form-login
+            username-parameter="userId"
+            password-parameter="userPw"
+            login-processing-url="/loginAction.do"
+            login-page="/login.do"
+            default-target-url="/boardList.do"
+            authentication-failure-url="/login.do?error=1"/>
+
+        <logout
+            logout-url="/logout.do"
+            logout-success-url="/login.do"
+            invalidate-session="true"
+            delete-cookies="true"/>
+
+        <csrf disabled="true"/>
+
+    </http>
+
+    <beans:bean id="userDeniedHandler" class="boardApp.security.UserDeniedHandler"/>
+    <beans:bean id="userService" class="boardApp.service.CustomUserDetailsService"/>
+    <beans:bean id="userAuthProvider" class="boardApp.security.CustomAuthenticationProvider"/>
+
+    <authentication-manager>
+        <authentication-provider ref="userAuthProvider"/>
+    </authentication-manager>
+
+</beans:beans>

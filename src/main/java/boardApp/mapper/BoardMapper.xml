@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="boardApp.mapper.BoardMapper">
+	<insert id="insertBoard" parameterType="boardApp.VO.BoardVO" useGeneratedKeys="true" keyProperty="boardNo">
+		INSERT INTO tb_board (
+			title, content, writer_id,  writer_name, view_cnt, file_yn, reg_date, del_yn
+		
+		
+		) VALUES (
+			#{title}, #{content},#{writerId}, #{writerName}, #{viewCnt},#{fileYn}, SYSDATETIME,'N'
+		
+		)
+	</insert>
+	<select id="selectBoardList" parameterType="boardApp.VO.BoardVO"
+	    resultType="boardApp.VO.BoardVO">
+	    SELECT b.board_no, b.title, b.writer_name, b.view_cnt, TO_CHAR(b.reg_date, 'YYYY-MM-DD HH24:MI:SS') AS reg_date,
+	    		COUNT(c.comt_no) AS comtCnt
+	    FROM tb_board b
+	    LEFT JOIN tb_comment c ON b.board_no = c.board_no AND c.comt_del_yn = 'N'
+	    WHERE b.del_yn = 'N'
+	    <if test ="searchKeyword != null and searchKeyword != ''">
+	    	<choose>
+	    		<when test="searchType == 'title'">
+	    			AND title LIKE CONCAT('%', #{searchKeyword}, '%')
+	    		</when>
+	    		<when test="searchType == 'content'">
+	    			AND content LIKE CONCAT('%',#{searchKeyword},'%')
+	    		</when>
+	    		<otherwise>
+	    			AND (title LIKE CONCAT('%', #{searchKeyword}, '%') OR content LIKE CONCAT('%',#{searchKeyword},'%'))
+	    		</otherwise>
+	    	</choose>
+	    </if>
+	    GROUP BY b.board_no, b.title, b.writer_name, b.view_cnt, b.reg_date
+	    ORDER BY b.board_no DESC
+	    LIMIT #{pageSize} OFFSET #{pageNo}
+	</select>
+	
+	<select id="selectBoardTotalCnt" parameterType ="boardApp.VO.BoardVO" resultType="int">
+		SELECT COUNT(*)
+		FROM tb_board
+		WHERE del_yn = 'N'
+		<if test ="searchKeyword != null and searchKeyword != ''">
+	    	<choose>
+	    		<when test="searchType == 'title'">
+	    			AND title LIKE CONCAT('%', #{searchKeyword}, '%')
+	    		</when>
+	    		<when test="searchType == 'content'">
+	    			AND content LIKE CONCAT('%',#{searchKeyword},'%')
+	    		</when>
+	    		<otherwise>
+	    			AND (title LIKE CONCAT('%', #{searchKeyword}, '%') OR content LIKE CONCAT('%',#{searchKeyword},'%'))
+	    		</otherwise>
+	    	</choose>
+	    </if>
+		
+	</select>
+	
+	<select id="selectBoardDetail" parameterType="int" resultType="boardApp.VO.BoardVO">
+		SELECT board_no, title, content, writer_name, view_cnt, TO_CHAR(reg_date, 'YYYY-MM-DD HH24:MI:SS') AS reg_date
+		FROM tb_board
+		WHERE board_no = #{boardNo}
+		AND del_yn = 'N'
+	
+	</select>
+	
+	<update id="updateViewCnt" parameterType="int">
+		UPDATE tb_board
+		SET view_cnt = view_cnt +1
+		WHERE board_no = #{boardNo}
+	
+	</update>
+	
+	
+	<update id="updateBoard" parameterType="boardApp.VO.BoardVO">
+		UPDATE tb_board
+		SET title = #{title},
+			content = #{content}
+			
+		WHERE board_no = #{boardNo}
+	
+	</update>
+	
+	<update id="deleteBoard" parameterType="int">
+		UPDATE tb_board
+		SET del_yn = 'Y'
+		
+		WHERE board_no = #{boardNo}
+	
+	</update>
+	
+</mapper>    
